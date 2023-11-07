@@ -1,4 +1,4 @@
-from nn import nn 
+from shallowgrad.nn import nn 
 from optimizers.optimizers import Adam
 import numpy as np
 from sklearn.metrics import r2_score
@@ -22,7 +22,7 @@ l3 = nn.Linear(500,1,bias=False)
 loss = nn.MeanSquaredLoss()
 optim = Adam(layers=[l1,l2,l3],lr=1e-4)
 
-BS = 64
+BS = 512
 for i in range(500):
   preds = []
   samp = np.random.randint(0, X.shape[0], size=(BS))
