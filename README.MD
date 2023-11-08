@@ -1,8 +1,39 @@
-shallowgrad: An oversimplified version of PyTorch made for educational purposes
+<b>shallowgrad:<b> An oversimplified version of PyTorch made for educational purposes
 
 It's extreme simplicity aims to remove the abstraction of modern deep learning frameworks while providing a similar interface to PyTorch.
 
 <p align="center">
-  <img src="shallowgrad.jpg" height ="300" width="350" title="hover text">
+  <img src="shallowgrad.jpg" height ="350" width="350" title="hover text">
 </p>
 
+<code>
+l1 = nn.Linear(784,2500,activation='ReLU',bias=True)
+l2 = nn.Linear(2500,1000,activation='ReLU',bias=True)
+l3 = nn.Linear(1000,10,bias=True) 
+loss = nn.CrossEntropyLoss() 
+optim = Adam(layers=[l1,l2,l3],lr=5-5)
+
+all_preds = []
+all_true_labels = []
+BS = 256
+NUM_EPOCHS = 100
+
+# training loop
+for _ in range(NUM_EPOCHS):
+    preds = []
+    samp = np.random.randint(0, X.shape[0], size=(BS))
+    x = X[samp]
+    y = Y[samp]
+    x = l1(x)
+    x = l2(x)
+    x = l3(x)
+    preds_batch = np.argmax(x, axis=1).reshape(-1, 1)
+
+    # Append batch predictions and true labels to the lists
+    all_preds.append(preds_batch)
+    all_true_labels.append(y)
+
+    l = loss(x, y)
+    loss.backwards()
+    optim.step()
+<code>
