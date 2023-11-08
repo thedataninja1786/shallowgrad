@@ -6,16 +6,25 @@ It's extreme simplicity aims to remove the abstraction of modern deep learning f
   <img src="shallowgrad.jpg" height ="350" width="350" title="hover text">
 </p>
 
+# Neural Networks in shallowgrad
 <pre>
 <code>
+from shallowgrad.nn import nn
+from optimizers.optimizers import Adam 
+
+# load MNIST
+X_train = X_train.reshape((-1,784))
+Y = Y_train.reshape(-1,1)
+X = np.array(X_train / 255)
+
 l1 = nn.Linear(784,2500,activation='ReLU',bias=True)
 l2 = nn.Linear(2500,1000,activation='ReLU',bias=True)
 l3 = nn.Linear(1000,10,bias=True) 
 loss = nn.CrossEntropyLoss() 
 optim = Adam(layers=[l1,l2,l3],lr=5-5)
 
-all_preds = []
-all_true_labels = []
+y_hat = []
+y_true = []
 BS = 256
 NUM_EPOCHS = 100
 
@@ -30,9 +39,9 @@ for _ in range(NUM_EPOCHS):
     x = l3(x)
     preds_batch = np.argmax(x, axis=1).reshape(-1, 1)
 
-    # Append batch predictions and true labels to the lists
-    all_preds.append(preds_batch)
-    all_true_labels.append(y)
+    # Append batch predictions and true labels 
+    y_hat.append(preds_batch)
+    y_true.append(y)
 
     l = loss(x, y)
     loss.backwards()
