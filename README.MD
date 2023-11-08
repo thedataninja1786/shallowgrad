@@ -6,13 +6,16 @@ It's extreme simplicity aims to remove the abstraction of modern deep learning f
   <img src="shallowgrad.jpg" height ="350" width="350" title="hover text">
 </p>
 
-# Neural Networks in shallowgrad
+# MNIST in shallowgrad
 <pre>
 <code>
+import numpy as np
 from shallowgrad.nn import nn
 from optimizers.optimizers import Adam 
 
 # load MNIST
+# ...
+
 X_train = X_train.reshape((-1,784))
 Y = Y_train.reshape(-1,1)
 X = np.array(X_train / 255)
