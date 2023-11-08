@@ -7,6 +7,7 @@ It's extreme simplicity aims to remove the abstraction of modern deep learning f
 </p>
 
 # Neural Networks in shallowgrad
+<pre>
 <code>
 from shallowgrad.nn import nn
 from optimizers.optimizers import Adam 
@@ -46,3 +47,4 @@ for _ in range(NUM_EPOCHS):
     loss.backwards()
     optim.step()
 </code>
+</pre>
