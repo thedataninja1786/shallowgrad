@@ -1,12 +1,12 @@
-import numpy as np 
+#import numpy as np 
 import pandas as pd
 from optimizers.optimizers import Adam
 from sklearn.metrics import accuracy_score
-from nn import nn
+from shallowgrad.nn import nn
 
-np.random.seed(0)
+#np.random.seed(0)
 
-df = pd.read_csv('datasets\heart.csv')
+df = pd.read_csv('heart.csv')
 Y = df['target'].to_numpy()
 del df['target']
 X = df.to_numpy()
