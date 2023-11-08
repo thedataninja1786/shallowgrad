@@ -6,6 +6,7 @@ It's extreme simplicity aims to remove the abstraction of modern deep learning f
   <img src="shallowgrad.jpg" height ="350" width="350" title="hover text">
 </p>
 
+<pre>
 <code>
 l1 = nn.Linear(784,2500,activation='ReLU',bias=True)
 l2 = nn.Linear(2500,1000,activation='ReLU',bias=True)
@@ -36,4 +37,5 @@ for _ in range(NUM_EPOCHS):
     l = loss(x, y)
     loss.backwards()
     optim.step()
-<code>
+</code>
+</pre>
