@@ -1,4 +1,4 @@
-<b>shallowgrad:<b> An oversimplified version of <a href="https://pytorch.org/">PyTorch</a> based on <a href="https://numpy.org/">numpy</a> made for educational purposes.
+<b>shallowgrad:<b> A simplified version of <a href="https://pytorch.org/">PyTorch</a> based on <a href="https://numpy.org/">numpy</a> made for educational purposes.
 
 It's extreme simplicity aims to dimistify the abstraction of modern deep learning frameworks while providing a similar interface to PyTorch.
 
@@ -24,7 +24,7 @@ l1 = nn.Linear(784,2500,activation='ReLU',bias=True)
 l2 = nn.Linear(2500,1000,activation='ReLU',bias=True)
 l3 = nn.Linear(1000,10,bias=True) 
 loss = nn.CrossEntropyLoss() 
-optim = Adam(layers=[l1,l2,l3],lr=5-5)
+optim = Adam(layers=[l1,l2,l3],lr=5e-5)
 
 y_hat = []
 y_true = []
