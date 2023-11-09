@@ -1,4 +1,4 @@
-<b>shallowgrad:<b> An oversimplified version of <a href="https://pytorch.org/">link PyTorch</a> based on numpy made for educational purposes.
+<b>shallowgrad:<b> An oversimplified version of <a href="https://pytorch.org/">PyTorch</a> based on numpy made for educational purposes.
 
 It's extreme simplicity aims to dimistify the abstraction of modern deep learning frameworks while providing a similar interface to PyTorch.
 
