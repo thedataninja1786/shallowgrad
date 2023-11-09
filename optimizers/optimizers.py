@@ -29,7 +29,7 @@ class SGD:
     for l in self.layers:
       l.weights -= self.lr * l.grad
 
-class RMSPROP:
+class RMSprop:
   def __init__(self,layers=[],lr=0.001,beta=0.9,e=1e-10):
     self.layers = layers
     self.lr = lr
