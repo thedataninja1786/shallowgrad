@@ -24,10 +24,10 @@ class nn:
       for i in reversed(range(len(nn.loss.instances))):
         #print('forward_pass: ',nn.loss.forward_passes[i].shape)
         g = np.dot(nn.loss.forward_passes[i].T, delta)
-        #print('g',g.shape)
+        nn.loss.instances[i].grad = g
         
-        nn.loss.instances[i].weights -= g * nn.loss.lr
-        if nn.loss.instances[i].bias: nn.loss.instances[i].bias -= np.sum(delta) * (nn.loss.lr / 10)
+        #nn.loss.instances[i].weights -= g * nn.loss.lr
+        #if nn.loss.instances[i].bias: nn.loss.instances[i].bias -= np.sum(delta) * (nn.loss.lr / 10)
         delta = np.dot(delta, nn.loss.instances[i].weights.T) * nn.loss.instances[i]._gradient(nn.loss.forward_passes[i])
         #print('transposed_shape_of_weights_after_update:', nn.loss.instances[i].weights.T.shape)
         
