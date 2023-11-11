@@ -24,7 +24,7 @@ l1 = nn.Linear(784,2500,activation='ReLU',bias=True)
 l2 = nn.Linear(2500,1000,activation='ReLU',bias=True)
 l3 = nn.Linear(1000,10,bias=True) 
 loss = nn.CrossEntropyLoss() 
-optim = Adam(layers=[l1,l2,l3],lr=5e-5)
+optim = Adam(layers=[l1,l2,l3],lr=3e-4)
 
 y_hat = []
 y_true = []
