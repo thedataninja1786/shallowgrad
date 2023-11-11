@@ -12,29 +12,13 @@ import numpy as np
 class nn:
   class loss:
     instances = []
-    forward_passes = []
-    activations = []
-    lr = 1e-4
  
     @staticmethod
-    def backward_prop(loss):
-      #print('loss_shape',loss.shape,' ','output_layer_shape: ',nn.loss.forward_passes[-1].shape)
-      delta = loss * nn.loss.instances[-1]._gradient(nn.loss.forward_passes[-1])
-      #print('delta',delta.shape)
-      for i in reversed(range(len(nn.loss.instances))):
-        #print('forward_pass: ',nn.loss.forward_passes[i].shape)
-        g = np.dot(nn.loss.forward_passes[i].T, delta)
-        nn.loss.instances[i].grad = g
-        
-        #nn.loss.instances[i].weights -= g * nn.loss.lr
-        #if nn.loss.instances[i].bias: nn.loss.instances[i].bias -= np.sum(delta) * (nn.loss.lr / 10)
-        delta = np.dot(delta, nn.loss.instances[i].weights.T) * nn.loss.instances[i]._gradient(nn.loss.forward_passes[i])
-        #print('transposed_shape_of_weights_after_update:', nn.loss.instances[i].weights.T.shape)
-        
-        #print('new_delta',delta.shape)
+    def backward_prop(g_loss):
+        delta = np.copy(g_loss)
+        for i in reversed(range(len(nn.loss.instances))):
+            delta = nn.loss.instances[i].backward(delta)
 
-      nn.loss.forward_passes = [] #empty forward passes
-    
   class Softmax:
     def __init__(self):
       pass
@@ -50,14 +34,13 @@ class nn:
       return softmax_output
     
     @staticmethod
-    def g_softmax(x):
+    def backward(x):
       return x * (1 - x)
 
 
   class ReLU:
     def __init__(self):
       self.x = None
-      nn.loss.activations.append(self)
 
     def __call__(self,x):
       return self.relu(x)
@@ -70,7 +53,7 @@ class nn:
       return f"ReLU applied in place with output shape: {x.shape}"
 
     @staticmethod
-    def g_relu(x): 
+    def backward(x): 
       return (x > 0).astype(int)
 
 
@@ -85,7 +68,7 @@ class nn:
     def __call__(self,x,a=0.5):
       return self.leakyrelu(x,a)
 
-    def g_leakyrelu(self,x,a=0.5):
+    def backward(self,x,a=0.5):
       return (x > 0).astype(int) + (a * (x <= 0)).astype(int)
     
 
@@ -99,7 +82,7 @@ class nn:
       return np.tanh(x)
       
     @staticmethod
-    def g_tanh(x):
+    def backward(x):
       return 1 - np.tanh(x) ** 2
     
   class Sigmoid:
@@ -116,7 +99,7 @@ class nn:
       else:
         return np.exp(x) / (1 + np.exp(x)) 
     
-    def g_sigmoid(self,x):
+    def backward(self,x):
       return (1 / (1 + np.exp(-x))) * (1 - (1 / (1 + np.exp(-x))))
 
 
@@ -129,10 +112,10 @@ class nn:
 
     def __call__(self,y_pred,y_true):
       self.y_pred = y_pred; self.y_true = y_true
-      return np.mean(np.square((self.y_pred - self.y_true))) # mean ensures a scalar
+      return ((self.y_true - self.y_pred) ** 2).mean()
 
     def backwards(self):
-      g = self.y_pred - self.y_true # grad of loss function
+      g = 2 * (self.y_pred - self.y_true) / len(self.y_true) # grad of loss function
       self.backward_prop(g)
 
   class CrossEntropyLoss(loss): #compare this tomorrow with pytorch and see if they return the same
@@ -146,8 +129,9 @@ class nn:
       self.y_true = y_true
       
       if len(y_true.shape) == 1 or y_true.shape[1] == 1: # convert to one-hot
-        one_hot = np.zeros((y_true.size, y_pred.shape[1]))
-        one_hot[np.arange(y_true.size), y_true] = 1
+        num_classes = np.max(y_true) + 1
+        one_hot = np.eye(num_classes)[y_true.flatten()]
+        one_hot = one_hot.reshape(-1, num_classes)
         self.y_true = one_hot
       
       self.y_pred = nn.Softmax()(y_pred)
@@ -155,8 +139,7 @@ class nn:
       return np.mean(-np.sum(self.y_true * np.log(self.y_pred + self.e), axis=1))
 
     def backwards(self):
-      # gradient
-      g = (self.y_pred - self.y_true) 
+      g = (self.y_pred - self.y_true) / self.y_true.shape[0]
       self.backward_prop(g)
 
   class BinaryCrossEntropyLoss(loss):
@@ -164,7 +147,7 @@ class nn:
       self.y_pred = None
       self.y_true = None
       super().__init__()
-      self.e = 1e-15 # prevent log(0)
+      self.e = 1e-15 
 
     def __call__(self,y_pred,y_true):
       self.y_pred = y_pred; self.y_true = y_true
@@ -172,69 +155,61 @@ class nn:
                       + ((1 - self.y_true) * np.log(1 - self.y_pred + self.e)))
 
     def backwards(self):
-      # gradient
       g = (self.y_pred - self.y_true) / ((self.y_pred + self.e) * (1 - self.y_pred + self.e))
       self.backward_prop(g)
 
-  class Linear(Softmax,ReLU,Tanh,Sigmoid,LeakyReLU):
+  class Linear:
     def __init__(self,in_features,out_features,bias=True,activation=None):
-      self.in_features = in_features
-      self.out_features = out_features
-      self.bias = bias
-      self.activation_func = activation
-      self.weights = self._weight_init()
-      self.grad = self._gradient(self.weights)
-      nn.loss.instances.append(self)
-      super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.bias = bias
+        self.activation_func = activation
+        self.weights = self._weight_init()
+        self.grad = None
+        self.forward_pass = None
+        self.x = None
+        self.grad_bias = None
+        nn.loss.instances.append(self)
+        super().__init__()
+
+        if activation == 'ReLU':
+            self.activation_func = nn.ReLU()
+        elif activation == 'LeakyReLU':
+            self.activation_func = nn.LeakyReLU()
+        elif activation == 'Tanh':
+            self.activation_func = nn.Tanh()
+        elif activation == 'Sigmoid':
+            self.activation_func = nn.Sigmoid()
+        elif activation == 'Softmax':
+            self.activation_func = nn.Softmax()
+        else: self.activation_func = None
 
     def __call__(self,x): # forward
-      if not nn.loss.forward_passes: nn.loss.forward_passes.append(x)
-      forward_pass = self._activation(x.dot(self.weights) + self.bias)
-      nn.loss.forward_passes.append(forward_pass)
-      return forward_pass
-    
-    @property
-    def weights(self):
-        return self._weights
-
-    @weights.setter
-    def weights(self, new_weights):
-        self._weights = new_weights
-        self.grad = self._gradient(new_weights)
+        self.x = x
+        if self.activation_func is not None:
+            self.forward_pass = self.activation_func(self.x.dot(self.weights) + self.bias)
+        else:
+            self.forward_pass = self.x.dot(self.weights) + self.bias
+        return self.forward_pass
     
     def __repr__(self):
-      return f"Linear(in_features={self.in_features}, out_features={self.out_features}, activation={self.activation_func})"
+        return f"Linear(in_features={self.in_features}, out_features={self.out_features}, activation={self.activation_func})"
 
     def _weight_init(self):
-      self.bias = np.random.uniform() * 0.01 if self.bias else 0
-      limit = np.sqrt(6.0 / (self.in_features + self.out_features))
-      return np.random.uniform(-1, 1, size=(self.in_features, self.out_features)) / np.sqrt(self.in_features * self.out_features)
-    
-    def _activation(self,x):
-      if not self.activation_func:
-        return x
-      elif self.activation_func == 'ReLU':
-        return self.relu(x)
-      elif self.activation_func == 'LeakyReLU':
-        return self.leakyrelu(x)
-      elif self.activation_func == 'Tanh':
-        return self.tanh(x)
-      elif self.activation_func == 'Sigmoid':
-        return self.sigmoid(x)
-      elif self.activation_func == 'Softmax':
-        return self.softmax(x)
+        """Initialize weights using Glorot uniform initialization"""
+        self.bias = np.random.uniform(size=(1,self.out_features)) * 0.01 if self.bias else 0
+        v = np.sqrt(2.0 / (self.in_features + self.out_features))
+        return np.random.normal(0, v, size=(self.in_features, self.out_features)) 
 
-    def _gradient(self,x):
-      if not self.activation_func: return np.ones([x.shape[0],x.shape[1]])
-      if self.activation_func == 'ReLU':
-        return self.g_relu(x)
-      elif self.activation_func == 'Tanh':
-        return self.g_tanh(x)
-      elif self.activation_func == 'Sigmoid':
-        return self.g_sigmoid(x)
-      elif self.activation_func == 'LeakyReLU':
-        return self.g_leakyrelu(x)
-      elif self.activation_func == 'Softmax':
-        return self.g_softmax(x)
-      else:
-        raise ValueError(f"Cannot compute gradient for object {x}!")
+
+    def backward(self, delta):
+        if self.activation_func:
+            # Calculate gradient of the activation function
+            delta = delta * self.activation_func.backward(self.forward_pass)
+        # Compute gradients for weights and bias
+        self.grad = np.dot(self.x.T, delta)
+        if self.bias is not None:
+            self.grad_bias = np.sum(delta, axis=0, keepdims=True)
+        # Compute gradient with respect to x
+        d_x = np.dot(delta, self.weights.T)
+        return d_x
