@@ -17,6 +17,9 @@ class nn:
       exp_x = np.exp(x)
       return exp_x / np.sum(exp_x, axis=1, keepdims=True)
     @staticmethod
+    def __repr__():
+      return "Softmax applied in place"
+    @staticmethod
     def backward(x):
       return x * (1 - x)
 
@@ -26,16 +29,18 @@ class nn:
       return np.maximum(0,x)
     @staticmethod
     def __repr__():
-      return f"ReLU applied in place"
+      return "ReLU applied in place"
     @staticmethod
     def backward(x): 
       return (x > 0).astype(int)
-
 
   class LeakyReLU:
     @staticmethod
     def __call__(x,a=0.5):
       return np.maximum(a * x, x)
+    @staticmethod
+    def __repr__():
+      return "LeakyReLU applied in place"
     @staticmethod
     def backward(x,a=0.5):
       return (x > 0).astype(int) + (a * (x <= 0)).astype(int)
@@ -44,6 +49,9 @@ class nn:
     @staticmethod
     def __call__(x):
       return np.tanh(x)
+    @staticmethod
+    def __repr__():
+      return "Tanh applied in place"
     @staticmethod
     def backward(x):
       return 1 - np.tanh(x) ** 2
@@ -55,6 +63,9 @@ class nn:
         return 1 / (1 + np.exp(-x))
       else:
         return np.exp(x) / (1 + np.exp(x)) 
+    @staticmethod
+    def __repr__():
+      return "Sigmoid applied in place"
     @staticmethod
     def backward(x):
       return (1 / (1 + np.exp(-x))) * (1 - (1 / (1 + np.exp(-x))))
