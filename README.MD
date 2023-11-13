@@ -51,6 +51,3 @@ for _ in range(NUM_EPOCHS):
     optim.step()
 </code>
 </pre>
-
-# Contributing 
-## shallowgrad is still on its early stages, and there is a lot of room for additional features and   
