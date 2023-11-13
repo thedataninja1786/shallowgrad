@@ -1,6 +1,6 @@
 <b>shallowgrad:<b> A simplified version of <a href="https://pytorch.org/">PyTorch</a> based on <a href="https://numpy.org/">numpy</a> made for educational purposes.
 
-It's extreme simplicity aims to dimistify the abstraction of modern deep learning frameworks while providing a similar interface to PyTorch.
+Its extreme simplicity aims to dimistify the abstraction of modern deep learning frameworks while providing a similar interface to PyTorch.
 
 <p align="center">
   <img src="shallowgrad.jpg" height ="350" width="350" title="hover text">
@@ -51,3 +51,6 @@ for _ in range(NUM_EPOCHS):
     optim.step()
 </code>
 </pre>
+
+# Contributing 
+## shallowgrad is still on its early stages, and there is a lot of room for additional features and   
