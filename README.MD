@@ -16,7 +16,7 @@ from optimizers.optimizers import Adam
 # load MNIST
 # ...
 
-X_train = X_train.reshape((-1,784))
+X_train = X_train.reshape(-1,28*28)
 Y = Y_train.reshape(-1,1)
 X = np.array(X_train / 255)
 
