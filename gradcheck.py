@@ -1,21 +1,23 @@
 import numpy as np
-def gradcheck(loss,x,y,layers=[],e=1e-10):
-    for layer_index, layer in enumerate(layers):
+
+def gradcheck(loss, x, y, layers=[], e=1e-10, threshold=1e-5):
+    for i, layer in enumerate(layers):
         grad_backprop = layer.grad
 
         grad_numerical = np.zeros_like(layer.weights)
         original_weights = np.copy(layer.weights)
-        
-        layer.weights = original_weights + e
-        loss_plus = loss(x,y)
-        layer.weights = original_weights - e
-        loss_minus = loss(x,y)
 
-        layer.weights = original_weights
+        for i in range(layer.weights.shape[0]):
+            for j in range(layer.weights.shape[1]):
+                layer.weights[i, j] = original_weights[i, j] + e
+                loss_plus = loss(x, y)
+                layer.weights[i, j] = original_weights[i, j] - e
+                loss_minus = loss(x, y)
+                layer.weights = original_weights
 
-        grad_numerical = (loss_plus - loss_minus) / (2.0 * e)
+                grad_numerical[i, j] = (loss_plus - loss_minus) / (2.0 * e)
 
-        relative_error = np.linalg.norm(grad_backprop - grad_numerical) / (np.linalg.norm(grad_backprop) + np.linalg.norm(grad_numerical))
+        relative_error = np.max(np.abs(grad_backprop - grad_numerical) / (np.abs(grad_backprop) + np.abs(grad_numerical)))
 
-        print('Relative Error for Layer {}: '.format(layer_index + 1), relative_error)
-        assert relative_error < 1e-5, 'The gradient is incorrect!'
+        print('Relative Error for Layer {}: '.format(i + 1), relative_error)
+        assert relative_error < threshold, 'The gradient is incorrect!'
