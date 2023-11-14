@@ -1,10 +1,8 @@
-#import numpy as np 
+import numpy as np 
 import pandas as pd
 from optimizers.optimizers import Adam
 from sklearn.metrics import accuracy_score
 from shallowgrad.nn import nn
-
-#np.random.seed(0)
 
 df = pd.read_csv('datasets/heart.csv')
 Y = df['target'].to_numpy()
@@ -19,13 +17,13 @@ optim = Adam(layers=[l1,l2,l3],lr=2e-5)
 
 for _ in range(10):
   preds= []
-  for x,y in zip(X,Y):
+    for x,y in zip(X,Y):
     x = x.reshape(1, -1)
     y = y.reshape(1, 1)
     x = l1(x)
     x = l2(x)
     x = l3(x)
-    if x[0][0] <= .5:
+    if x[0][0] <= 0.5:
       x[0] = 0
     else:
       x[0] = 1
@@ -35,4 +33,4 @@ for _ in range(10):
     loss.backwards()
     optim.step()
 
-  print(accuracy_score(Y,preds))
+print(accuracy_score(Y,preds))
