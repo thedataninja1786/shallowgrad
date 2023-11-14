@@ -16,9 +16,9 @@ true_intercept = 1.0
 Y = np.dot(X_i,true_coeffs) + noise
 X = np.array(X_i)
 
-l1 = nn.Linear(5,1000,activation='LeakyReLU',bias=False)
-l2 = nn.Linear(1000,500,activation='LeakyReLU',bias=False)
-l3 = nn.Linear(500,1,bias=False)
+l1 = nn.Linear(5,1000,activation='LeakyReLU',bias=True)
+l2 = nn.Linear(1000,500,activation='LeakyReLU',bias=True)
+l3 = nn.Linear(500,1,bias=True)
 loss = nn.MeanSquaredLoss()
 optim = Adam(layers=[l1,l2,l3],lr=1e-4)
 
@@ -29,9 +29,7 @@ for i in range(500):
   x = X[samp]
   y = Y[samp]
   x = l1(x)
-  #x = nn.LeakyReLU()(x)
   x = l2(x)
-  #x = nn.LeakyReLU()(x)
   x = l3(x)
 
   for el in x:
@@ -42,5 +40,3 @@ for i in range(500):
   optim.step()
 
   if i % 10 == 0: print(mean_squared_error(y,preds))
-print('R_squared: ',r2_score(preds,y))
-#print(plt.scatter(y,preds))
