@@ -1,18 +1,13 @@
-import requests
-import gzip
-import os
-import hashlib
-import numpy as np
 from shallowgrad.nn import nn
-from optimizers.optimizers import Adam 
-import tempfile
-from gradcheck import gradcheck
-
+from optimizers.optimizers import Adam
+import gzip
+import numpy as np
 
 def read_file(fp):
     with open(fp, "rb") as f:
         dat = f.read()
     return np.frombuffer(gzip.decompress(dat), dtype=np.uint8).copy()
+
 X_train = read_file(r"datasets\b0cdab8e37ae7c1c5560ee858afaac1d")[0x10:]
 Y_train = read_file(r"datasets\d4fdde61aca9f72d5fe2315410bb46a5")[8:]
 
