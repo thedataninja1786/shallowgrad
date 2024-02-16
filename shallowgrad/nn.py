@@ -139,18 +139,17 @@ class nn:
       self.x = None
       self.grad_bias = None
       nn.loss.instances.append(self) # record instance for backprop
-      super().__init__()
-
+  
       if activation == 'ReLU':
-          self.activation_func = nn.ReLU()
+        self.activation_func = nn.ReLU()
       elif activation == 'LeakyReLU':
-          self.activation_func = nn.LeakyReLU()
+        self.activation_func = nn.LeakyReLU()
       elif activation == 'Tanh':
-          self.activation_func = nn.Tanh()
+        self.activation_func = nn.Tanh()
       elif activation == 'Sigmoid':
-          self.activation_func = nn.Sigmoid()
+        self.activation_func = nn.Sigmoid()
       elif activation == 'Softmax':
-          self.activation_func = nn.Softmax()
+        self.activation_func = nn.Softmax()
       else: self.activation_func = None
 
     def __call__(self,x): # forward
