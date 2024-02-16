@@ -33,7 +33,6 @@ NUM_EPOCHS = 100
 
 # training loop
 for _ in range(NUM_EPOCHS):
-    preds = []
     samp = np.random.randint(0, X.shape[0], size=(BS))
     x = X[samp]
     y = Y[samp]
