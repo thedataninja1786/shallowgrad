@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def gradcheck(loss, x, y, layers=[], e=1e-10, threshold=1e-5):
     for i, layer in enumerate(layers):
         grad_backprop = layer.grad
@@ -17,7 +18,10 @@ def gradcheck(loss, x, y, layers=[], e=1e-10, threshold=1e-5):
 
                 grad_numerical[i, j] = (loss_plus - loss_minus) / (2.0 * e)
 
-        relative_error = np.max(np.abs(grad_backprop - grad_numerical) / (np.abs(grad_backprop) + np.abs(grad_numerical)))
+        relative_error = np.max(
+            np.abs(grad_backprop - grad_numerical)
+            / (np.abs(grad_backprop) + np.abs(grad_numerical))
+        )
 
-        print('Relative Error for Layer {}: '.format(i + 1), relative_error)
-        assert relative_error < threshold, 'The gradient is incorrect!'
+        print(f"Relative Error for layer {i + 1}: {relative_error}")
+        assert relative_error < threshold, "The gradient is incorrect!"
